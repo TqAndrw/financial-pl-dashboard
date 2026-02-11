@@ -86,3 +86,17 @@ CALCULATE(
     ),
     'Finance_Fact_GL'[Scenario] = "Actual"
 )
+```
+```Dynamic Variance Calculatio
+Variance % = DIVIDE([Actual Amount] - [Budget Amount], ABS([Budget Amount]), 0)
+```
+
+## 5. How to Run This Project
+Clone the repository:
+
+```Bash
+git clone [https://github.com/YOUR_USERNAME/financial-pl-dashboard.git](https://github.com/YOUR_USERNAME/financial-pl-dashboard.git)
+```
+Open Power BI: Open dashboard/Financial_PL_Dashboard.pbix.
+
+Refresh Data: Point the data source to the local data/ folder (CSV files).
