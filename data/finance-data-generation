@@ -1,0 +1,71 @@
+import pandas as pd
+import numpy as np
+import random
+from datetime import datetime, timedelta
+
+# --- CẤU HÌNH ---
+start_date = datetime(2025, 1, 1)
+days = 365
+# Tạo danh sách tài khoản (Chart of Accounts Simpler Version)
+accounts = [
+    # Doanh thu
+    {'Account_ID': '101', 'Account_Name': 'Sales Revenue', 'Parent': 'Revenue', 'Type': 'Revenue', 'Sign': 1},
+    {'Account_ID': '102', 'Account_Name': 'Service Revenue', 'Parent': 'Revenue', 'Type': 'Revenue', 'Sign': 1},
+    
+    # Giá vốn (COGS)
+    {'Account_ID': '201', 'Account_Name': 'Raw Materials', 'Parent': 'COGS', 'Type': 'Expense', 'Sign': -1},
+    {'Account_ID': '202', 'Account_Name': 'Manufacturing Labor', 'Parent': 'COGS', 'Type': 'Expense', 'Sign': -1},
+    
+    # Chi phí vận hành (OpEx)
+    {'Account_ID': '301', 'Account_Name': 'Marketing Spend', 'Parent': 'OpEx', 'Type': 'Expense', 'Sign': -1},
+    {'Account_ID': '302', 'Account_Name': 'Office Rent', 'Parent': 'OpEx', 'Type': 'Expense', 'Sign': -1},
+    {'Account_ID': '303', 'Account_Name': 'Software Licenses', 'Parent': 'OpEx', 'Type': 'Expense', 'Sign': -1},
+    {'Account_ID': '304', 'Account_Name': 'Salaries & Wages', 'Parent': 'OpEx', 'Type': 'Expense', 'Sign': -1},
+    
+    # Thuế & Lãi vay
+    {'Account_ID': '401', 'Account_Name': 'Interest Expense', 'Parent': 'Other', 'Type': 'Expense', 'Sign': -1},
+    {'Account_ID': '402', 'Account_Name': 'Corporate Tax', 'Parent': 'Other', 'Type': 'Expense', 'Sign': -1}
+]
+
+dim_accounts = pd.DataFrame(accounts)
+
+# --- TẠO DỮ LIỆU GIAO DỊCH (FACT TABLE) ---
+data = []
+print("Generating Financial Data...")
+
+for i in range(days):
+    current_date = start_date + timedelta(days=i)
+    month = current_date.month
+    
+    # Seasonality: Doanh thu cao vào cuối năm
+    seasonality = 1.0 + (0.1 * month) if month > 9 else 1.0
+    
+    for acc in accounts:
+        # 1. Tạo số liệu Thực tế (Actual)
+        # Random số tiền giao dịch mỗi ngày
+        base_amount = 0
+        if acc['Parent'] == 'Revenue': base_amount = random.uniform(5000, 15000) * seasonality
+        elif acc['Parent'] == 'COGS': base_amount = random.uniform(2000, 6000) * seasonality # COGS thường chiếm 40-50% Rev
+        elif acc['Parent'] == 'OpEx': base_amount = random.uniform(500, 2000) # OpEx đều đặn
+        else: base_amount = random.uniform(100, 500)
+
+        # Thêm biến động
+        actual_amount = round(base_amount * random.uniform(0.8, 1.2), 2)
+        
+        data.append([current_date, acc['Account_ID'], 'Actual', actual_amount])
+
+        # 2. Tạo số liệu Ngân sách (Budget)
+        # Budget thường được lập từ đầu năm, nên nó "phẳng" hơn và ít biến động hơn
+        budget_amount = round(base_amount * 1.05, 2) # Giả sử đặt mục tiêu cao hơn 5%
+        # Budget chỉ ghi nhận vào ngày đầu tháng (thông thường) hoặc chia đều. 
+        # Để đơn giản cho Power BI, ta giả lập Budget daily nhưng ít biến động.
+        data.append([current_date, acc['Account_ID'], 'Budget', budget_amount])
+
+fact_gl = pd.DataFrame(data, columns=['Date', 'Account_ID', 'Scenario', 'Amount'])
+
+# Xuất ra 2 file
+fact_gl.to_csv('Finance_Fact_GL.csv', index=False)
+dim_accounts.to_csv('Finance_Dim_Accounts.csv', index=False)
+
+print("Xong! Đã tạo 2 file: Finance_Fact_GL.csv và Finance_Dim_Accounts.csv")
+print(fact_gl.head())

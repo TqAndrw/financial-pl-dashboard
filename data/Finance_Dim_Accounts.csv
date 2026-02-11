@@ -1,0 +1,11 @@
+Account_ID,Account_Name,Parent,Type,Sign
+101,Sales Revenue,Revenue,Revenue,1
+102,Service Revenue,Revenue,Revenue,1
+201,Raw Materials,COGS,Expense,-1
+202,Manufacturing Labor,COGS,Expense,-1
+301,Marketing Spend,OpEx,Expense,-1
+302,Office Rent,OpEx,Expense,-1
+303,Software Licenses,OpEx,Expense,-1
+304,Salaries & Wages,OpEx,Expense,-1
+401,Interest Expense,Other,Expense,-1
+402,Corporate Tax,Other,Expense,-1
